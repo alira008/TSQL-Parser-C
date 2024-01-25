@@ -6,7 +6,7 @@ pub fn build(b: *std.Build) void {
 
     const exe = b.addExecutable(.{ .name = "tsql-parser", .root_source_file = .{ .path = "src/main.c" }, .link_libc = true, .target = target, .optimize = optimize });
 
-    exe.addCSourceFiles(&.{"src/lexer.c"}, &.{
+    exe.addCSourceFiles(&.{ "src/lexer.c", "src/arena.c" }, &.{
         "-std=c17",
         "-pedantic",
         "-Wall",

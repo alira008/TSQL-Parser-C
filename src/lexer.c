@@ -2,12 +2,13 @@
 
 #include <ctype.h>
 #include <stdbool.h>
-#include <stdio.h>
+// #include <stdio.h>
 #include <string.h>
 
 #include "common.h"
 
 struct Lexer {
+  Arena* arena;
   const char* input;
   size_t input_length;
   size_t position;
@@ -19,9 +20,10 @@ struct Lexer {
 
 void lexer_read_char(Lexer* lexer);
 
-Lexer* lexer_new(const char* input) {
+Lexer* lexer_new(Arena* arena, const char* input) {
   Lexer* lexer = (Lexer*)malloc(sizeof(Lexer));
   memset(lexer, 0, sizeof(Lexer));
+  lexer->arena = arena;
   lexer->input_length = strlen(input);
   lexer->input = input;
   lexer->line = 1;
@@ -72,20 +74,25 @@ void lexer_read_char(Lexer* lexer) {
 
 StringView lexer_read_identifier(Lexer* lexer) {
   size_t position = lexer->position;
-  while (lexer_is_letter(lexer->ch) && lexer_peek_char(lexer) != '\0') {
+  while (lexer_is_letter(lexer->ch) && lexer->ch != '\0') {
     lexer_read_char(lexer);
   }
 
   StringView string_view = {0};
-  string_view.data = lexer->input + position;
-  string_view.length = lexer->position - position;
+  size_t size = lexer->position - position;
+  char* content = arena_alloc(lexer->arena, size);
+  for (int i = 0; i < size; ++i) {
+    content[i] = lexer->input[position + i];
+  }
+  string_view.data = content;
+  string_view.length = size;
 
   return string_view;
 }
 
 StringView lexer_read_number(Lexer* lexer) {
   size_t position = lexer->position;
-  while (lexer_is_number(lexer->ch) && lexer_peek_char(lexer) != '\0') {
+  while (lexer_is_number(lexer->ch) && lexer->ch != '\0') {
     lexer_read_char(lexer);
   }
 
@@ -102,7 +109,7 @@ StringView lexer_read_quoted_literal(Lexer* lexer, char quote_char) {
   size_t position = lexer->position;
 
   while (lexer->ch != quote_char && lexer_peek_char(lexer) != quote_char &&
-         lexer_peek_char(lexer) != '\0') {
+         lexer->ch != '\0') {
     lexer_read_char(lexer);
   }
 
@@ -119,7 +126,7 @@ StringView lexer_read_quoted_literal(Lexer* lexer, char quote_char) {
 StringView lexer_read_alias(Lexer* lexer) {
   size_t position = lexer->position;
 
-  while (lexer->ch != ']' && lexer_peek_char(lexer) != '\0') {
+  while (lexer->ch != ']' && lexer->ch != '\0') {
     lexer_read_char(lexer);
   }
 
@@ -131,7 +138,7 @@ StringView lexer_read_alias(Lexer* lexer) {
 }
 
 void lexer_skip_whitespace(Lexer* lexer) {
-  while (isspace(lexer->ch) && lexer_peek_char(lexer) != '\0') {
+  while (isspace(lexer->ch) && lexer->ch != '\0') {
     lexer_read_char(lexer);
   }
 }

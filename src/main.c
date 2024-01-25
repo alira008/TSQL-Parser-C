@@ -1,10 +1,12 @@
 #include <stdio.h>
 
-#include "token.h"
+#include "arena.h"
 #include "lexer.h"
+#include "token.h"
 
 int main(void) {
-  Lexer* lexer = lexer_new("=hello world");
+  Arena arena = {0};
+  Lexer* lexer = lexer_new(&arena, "=hello world");
   Location location = lexer_location(lexer);
 
   Token token = lexer_next_token(lexer);
@@ -12,13 +14,14 @@ int main(void) {
     if (token.type == TOKEN_IDENTIFIER) {
       printf("Identifier: %s\n", token.value.identifier.literal);
     } else if (token.type == TOKEN_NUMBER) {
-      printf("%s\n", token.value.number);
+      printf("%lf\n", token.value.number);
     }
     token = lexer_next_token(lexer);
   }
 
-  printf("col: %d, line: %d\n", location.column, location.line);
+  printf("col: %ld, line: %ld\n", location.column, location.line);
 
+  arena_free(&arena);
   free(lexer);
 
   return 0;
