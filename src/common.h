@@ -7,4 +7,12 @@ typedef struct {
   size_t length;
 } StringView;
 
+#ifndef SV_FMT
+#define SV_FMT "%.*s"
+#endif
+
+#ifndef SV_ARG
+#define SV_ARG(sv) (int)(sv).length, (sv).data
+#endif
+
 #endif // !COMMON_H

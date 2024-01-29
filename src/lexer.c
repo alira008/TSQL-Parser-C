@@ -7,29 +7,17 @@
 
 #include "common.h"
 
-struct Lexer {
-  Arena* arena;
-  const char* input;
-  size_t input_length;
-  size_t position;
-  size_t read_position;
-  char ch;
-  size_t line;
-  size_t column;
-};
-
 void lexer_read_char(Lexer* lexer);
 
-Lexer* lexer_new(Arena* arena, const char* input) {
-  Lexer* lexer = (Lexer*)malloc(sizeof(Lexer));
-  memset(lexer, 0, sizeof(Lexer));
-  lexer->arena = arena;
-  lexer->input_length = strlen(input);
-  lexer->input = input;
-  lexer->line = 1;
-  lexer->ch = '\0';
+Lexer lexer_new(Arena* arena, const char* input) {
+  Lexer lexer = {};
+  lexer.arena = arena;
+  lexer.input_length = strlen(input);
+  lexer.input = input;
+  lexer.line = 1;
+  lexer.ch = '\0';
 
-  lexer_read_char(lexer);
+  lexer_read_char(&lexer);
   return lexer;
 }
 
@@ -80,11 +68,7 @@ StringView lexer_read_identifier(Lexer* lexer) {
 
   StringView string_view = {0};
   size_t size = lexer->position - position;
-  char* content = arena_alloc(lexer->arena, size);
-  for (int i = 0; i < size; ++i) {
-    content[i] = lexer->input[position + i];
-  }
-  string_view.data = content;
+  string_view.data = lexer->input + position;
   string_view.length = size;
 
   return string_view;
@@ -152,8 +136,7 @@ Token lexer_next_token(Lexer* lexer) {
     StringView string_view = lexer_read_identifier(lexer);
 
     token.type = TOKEN_IDENTIFIER;
-    token.value.identifier.literal = string_view.data;
-    token.value.identifier.length = string_view.length;
+    token.value.identifier = string_view;
 
     lexer_read_char(lexer);
     return token;

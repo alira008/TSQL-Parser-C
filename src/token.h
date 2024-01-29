@@ -1,6 +1,7 @@
 #ifndef TOKEN_H
 #define TOKEN_H
 #include <stdlib.h>
+#include "common.h"
 
 enum TokenType {
   TOKEN_IDENTIFIER,
@@ -45,7 +46,7 @@ typedef struct {
 typedef struct {
   union {
     QuotedLiteral quoted_literal;
-    Identifier identifier;
+    StringView identifier;
     double number;
     int integer;
   } value;
