@@ -61,22 +61,59 @@ String string_from_cstrn(const char *cstr, size_t length);
 String string_from_sv(StringView sv);
 String string_from_cstr(const char *cstr);
 
+#define STRING_INIT_CAPACITY 8
+#define STRING_APPEND(str, value)                                     \
+  do {                                                                \
+    if ((str)->length >= (str)->capacity) {                           \
+      if ((str)->capacity == 0) {                                     \
+        (str)->capacity = STRING_INIT_CAPACITY;                       \
+      }                                                               \
+      (str)->capacity = (str)->capacity * 2;                          \
+      (str)->data = (typeof((str)->data))realloc(                     \
+          (str)->data, ((str)->capacity + 1) * sizeof(*(str)->data)); \
+    }                                                                 \
+    if ((str)->data != NULL) {                                        \
+      (str)->data[(str)->length++] = (value);                         \
+      (str)->data[(str)->length] = '\0';                              \
+    }                                                                 \
+  } while (0)
+
+#define STRING_APPEND_MULTI(str, value, amount)                       \
+  do {                                                                \
+    if ((str)->length + amount > (str)->capacity) {                   \
+      if ((str)->capacity == 0) {                                     \
+        (str)->capacity = STRING_INIT_CAPACITY;                       \
+      }                                                               \
+      while ((str)->length + amount > (str)->capacity) {              \
+        (str)->capacity = (str)->capacity * 2;                        \
+      }                                                               \
+      (str)->data = (typeof((str)->data))realloc(                     \
+          (str)->data, ((str)->capacity + 1) * sizeof(*(str)->data)); \
+    }                                                                 \
+    if ((str)->data != NULL) {                                        \
+      memcpy((str)->data + (str)->length, (value),                    \
+             amount * sizeof(*(str)->data));                          \
+      (str)->length += amount;                                        \
+      (str)->data[(str)->length] = '\0';                              \
+    }                                                                 \
+  } while (0)
+
 #define STRING_APPEND_SV(s, sv)                 \
   do {                                          \
-    DA_APPEND_MULTI((s), sv->data, sv->length); \
+    STRING_APPEND_MULTI((s), sv->data, sv->length); \
   } while (0)
 
 #define STRING_APPEND_CSTRN(s, cstr, length) \
   do {                                       \
     const char *cstr_ = (cstr);              \
-    DA_APPEND_MULTI((s), cstr_, length);     \
+    STRING_APPEND_MULTI((s), cstr_, length);     \
   } while (0)
 
 #define STRING_APPEND_CSTR(s, cstr)       \
   do {                                    \
     const char *cstr_ = (cstr);           \
     size_t length_ = strlen(cstr_);       \
-    DA_APPEND_MULTI((s), cstr_, length_); \
+    STRING_APPEND_MULTI((s), cstr_, length_); \
   } while (0)
 
 #endif  // !COMMON_H

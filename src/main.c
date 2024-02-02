@@ -21,10 +21,11 @@ int main(void) {
   }
 
   String str = string_from_cstr("hello my boys");
-  printf("str: "SV_FMT"\n", SV_ARG(str));
-  printf("str: "SV_FMT"\n", SV_ARG(str));
-  STRING_APPEND_CSTR(&str, "\nhow are you doing today?");
-  printf("str: "SV_FMT"\n", SV_ARG(str));
+  printf("str: %s\n", str.data);
+  STRING_APPEND_CSTR(&str, "lmao");
+  printf("str: %s\n", str.data);
+  STRING_APPEND_CSTR(&str, " how are you doing today?");
+  printf("str: %s\n", str.data);
   free(str.data);
 
   printf("col: %ld, line: %ld\n", location.column, location.line);

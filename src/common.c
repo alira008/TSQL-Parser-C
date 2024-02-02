@@ -7,7 +7,7 @@ String string_from_cstrn(const char *cstr, size_t length) {
   s.capacity = length;
 
   // copy string
-  if (memcpy(s.data, cstr, length) == NULL) {
+  if (memcpy(s.data, cstr, length + 1) == NULL) {
     printf("Was not able to copy string\n");
     free(s.data);
     s.data = NULL;
@@ -16,8 +16,8 @@ String string_from_cstrn(const char *cstr, size_t length) {
     return s;
   }
 
-  // // set null terminator
-  // s.data[length] = '\0';
+  // set null terminator
+  s.data[length] = '\0';
   return s;
 }
 
