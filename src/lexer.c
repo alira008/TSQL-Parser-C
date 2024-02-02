@@ -68,8 +68,7 @@ StringView lexer_read_identifier(Lexer* lexer) {
 
   StringView string_view = {0};
   size_t size = lexer->position - position;
-  string_view.data = lexer->input + position;
-  string_view.length = size;
+  STRING_VIEW_INIT_FROM_OFFSET(&string_view, lexer->input, position, size);
 
   return string_view;
 }

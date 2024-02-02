@@ -51,6 +51,16 @@ typedef struct {
   size_t length;
 } StringView;
 
+#define STRING_VIEW_INIT_FROM_OFFSET(sv, str, offset, len) \
+  do {                                                         \
+    (sv)->data = (str) + (offset);                            \
+    (sv)->length = (len);                                   \
+  } while (0)
+#define STRING_VIEW_INIT(sv, data, length)                   \
+  do {                                                       \
+    STRING_VIEW_INIT_FROM_OFFSET((sv), (data), 0, (length)); \
+  } while (0)
+
 typedef struct {
   char *data;
   size_t length;
@@ -98,21 +108,21 @@ String string_from_cstr(const char *cstr);
     }                                                                 \
   } while (0)
 
-#define STRING_APPEND_SV(s, sv)                 \
-  do {                                          \
+#define STRING_APPEND_SV(s, sv)                     \
+  do {                                              \
     STRING_APPEND_MULTI((s), sv->data, sv->length); \
   } while (0)
 
 #define STRING_APPEND_CSTRN(s, cstr, length) \
   do {                                       \
     const char *cstr_ = (cstr);              \
-    STRING_APPEND_MULTI((s), cstr_, length);     \
+    STRING_APPEND_MULTI((s), cstr_, length); \
   } while (0)
 
-#define STRING_APPEND_CSTR(s, cstr)       \
-  do {                                    \
-    const char *cstr_ = (cstr);           \
-    size_t length_ = strlen(cstr_);       \
+#define STRING_APPEND_CSTR(s, cstr)           \
+  do {                                        \
+    const char *cstr_ = (cstr);               \
+    size_t length_ = strlen(cstr_);           \
     STRING_APPEND_MULTI((s), cstr_, length_); \
   } while (0)
 
