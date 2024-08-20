@@ -4,6 +4,12 @@
 #include <stdlib.h>
 #include <string.h>
 
+#ifdef _WIN32
+#define typeof __typeof__
+#else
+#define typeof typeof
+#endif
+
 #define DA_INIT_CAPACITY 8
 #define DA_APPEND(da, value)                                 \
   do {                                                       \
@@ -52,9 +58,9 @@ typedef struct {
 } StringView;
 
 #define STRING_VIEW_INIT_FROM_OFFSET(sv, str, offset, len) \
-  do {                                                         \
-    (sv)->data = (str) + (offset);                            \
-    (sv)->length = (len);                                   \
+  do {                                                     \
+    (sv)->data = (str) + (offset);                         \
+    (sv)->length = (len);                                  \
   } while (0)
 #define STRING_VIEW_INIT(sv, data, length)                   \
   do {                                                       \
